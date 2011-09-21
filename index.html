@@ -22,7 +22,7 @@
             var choice;
 
             $(document).ready( function() {
-                if(! Modernizr.canvas) {
+                if(Pixastic.Client.isIE()) {
                     var fieldset = document.getElementById("fieldset");
                     while(fieldset.childNodes.length >= 1) {
                         fieldset.removeChild(fieldset.firstChild);
@@ -32,7 +32,7 @@
                     fieldset.appendChild(legend);
                     var para = document.createElement("p");
                     para.appendChild(document.createTextNode(
-                        "Your browser does not support HTML5 Canvas."));
+                        "Pixastic doesn't support your browser."));
                     fieldset.appendChild(para);
                     para = document.createElement("p");
                     para.appendChild(document.createTextNode(
