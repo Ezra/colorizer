@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+    <head>
+        <title>
+            Avatar Colorizer Demo
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+        <script type="text/javascript" src="http://meta100.github.com/mColorPicker/javascripts/mColorPicker_min.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="modernizr.js"></script>
+        <script type="text/javascript" src="preloader.js"></script>
+        <script type="text/javascript" src="pixastic.blend.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Short+Stack'
+                rel='stylesheet' type='text/css'>
+        <script type="text/javascript">
+            var layers;
+            var w;
+            var h;
+            var n;
+
+            $(document).ready( function() {
+                if(Modernizr.inputtypes.color) {
+                    $.fn.mColorPicker.init.replace = false;
+                } else {
+                    $('input.mColorPicker').bind('colorpicked', pickColor);
+                }
+                        
+                new ImagePreloader( [
+                            "layers/jyrras_01.png",
+                            "layers/jyrras_02.png",
+                            "layers/jyrras_03.png",
+                            "layers/jyrras_04.png",
+                            "layers/jyrras_05.png",
+                            "layers/jyrras_06.png",
+                            "layers/jyrras_07.png",
+                            "layers/jyrras_08.png",
+                            "layers/jyrras_09.png"],
+                        function(images) {
+                            layers = images;
+                            w = layers[0].width;
+                            h = layers[1].height; 
+                            n = layers.length;
+                            draw();
+                        });
+            });
+
+            function pickColor() {
+                draw();
+            }
+
+            function changeColor() {
+                if(Modernizr.inputtypes.color) {
+                    draw();
+                }
+            }
+
+            function draw() {
+                var canvas = document.getElementById("draw_area");
+                canvas.width = w;
+                canvas.height = h;
+                if(canvas.getContext) {
+                    var ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0,
+                            canvas.clientWidth, canvas.clientHeight);
+                    ctx.save();
+
+                    var color = document.createElement("canvas");
+                    color.width = w;
+                    color.height = h;
+                    var colorctx = color.getContext("2d");
+                    var cLayers = {};
+
+                    for (i=0; i < n; i++) {
+                        colorctx.fillStyle = 
+                                document.getElementById("c"+i).value;
+                        colorctx.fillRect(0, 0, w, h);
+
+                        cLayers[i] = Pixastic.process(
+                            layers[i], "blend",
+                            {
+                                amount: 1,
+                                mode: "overlay",
+                                image: color
+                            }
+                        ); 
+                    }
+
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0, 0, w, h);
+                    for(i=0; i < n; i++) {
+                        ctx.drawImage(cLayers[i], 0, 0);
+                    }
+
+                    ctx.restore();
+                }
+            }
+        </script>
+        <style type="text/css">
+            body {text-align: center;}
+            .table {display: inline-table;}
+            .row {display: table-row;
+                    border: 1px solid black;}
+            label {display: table-cell;
+                    text-align: left;
+                    padding-right: 2px;}
+            input {display: table-cell;
+                    height: 1.8em;
+                    width: 1.8em;}
+        </style>
+    </head>
+    <body>
+        <h2>Avatar Colorizer Demo</h2>
+        <canvas id="draw_area" width="200" height="200"></canvas>
+        <div><div class="table">
+            <span class="row">
+            <label for="c0">Background</label>
+            <input id="c0" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#43799F" />
+            </span>
+            <span class="row">
+            <label for="c1">Coat</label>
+            <input id="c1" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#608ABC" />
+            </span>
+            <span class="row">
+            <label for="c2">Turtleneck</label>
+            <input id="c2" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#363636" />
+            </span>
+            <span class="row">
+            <label for="c3">Fur</label>
+            <input id="c3" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#F2E083" />
+            </span>
+            <span class="row">
+            <label for="c4">Ears</label>
+            <input id="c4" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#E58A93" />
+            </span>
+            <span class="row">
+            <label for="c5">Eyes</label>
+            <input id="c5" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#099AF7" />
+            </span>
+            <span class="row">
+            <label for="c6">Hair</label>
+            <input id="c6" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#1B1D1C" />
+            </span>
+            <span class="row">
+            <label for="c7">Goggles</label>
+            <input id="c7" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#003762" />
+            </span>
+            <span class="row">
+            <label for="c8">Goggle Lenses</label>
+            <input id="c8" type="color" onChange="changeColor();"
+                    data-hex="true" data-text="hidden" value="#72A3E5" />
+            </span>
+        </div></div>
+
+        <p>Pixastic is used under 
+            <a href="http://www.pixastic.com/lib/license.txt">
+                the Mozilla Public License</a>.
+        <br />Jyrras is used under <a href="http://missmab.com/about.php">
+                the DMFA art usage policy</a>.</p>
+    </body>
+</html>
