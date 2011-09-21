@@ -6,47 +6,148 @@
         </title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-        <script type="text/javascript" src="http://meta100.github.com/mColorPicker/javascripts/mColorPicker_min.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="mColorPicker.min.js"></script>
         <script type="text/javascript" src="modernizr.js"></script>
         <script type="text/javascript" src="preloader.js"></script>
         <script type="text/javascript" src="pixastic.blend.js"></script>
-        <link href='http://fonts.googleapis.com/css?family=Short+Stack'
-                rel='stylesheet' type='text/css'>
         <script type="text/javascript">
-            var layers;
-            var w;
-            var h;
-            var n;
+            // characters[charnum].name
+            // characters[charnum].layers.length
+            // characters[charnum].layers[layernum].name
+            // characters[charnum].layers[layernum].color
+            // characters[charnum].layers[layernum].src
+            // characters[charnum].layers[layernum].image
+            var characters;
+            // index of the last known character (or null)
+            var choice;
 
             $(document).ready( function() {
+                characters = [{
+                        name: "Jyrras", layers: [{
+                                name: "Background",
+                                src: "layers/jyrras_01.png",
+                                color: "#43799f"
+                            },{
+                                name: "Coat",
+                                src: "layers/jyrras_02.png",
+                                color: "#608abc"
+                            },{
+                                name: "Turtleneck",
+                                src: "layers/jyrras_03.png",
+                                color: "#363636"
+                            },{
+                                name: "Fur",
+                                src: "layers/jyrras_04.png",
+                                color: "#f2e083"
+                            },{
+                                name: "Ears",
+                                src: "layers/jyrras_05.png",
+                                color: "#e58a93"
+                            },{
+                                name: "Eyes",
+                                src: "layers/jyrras_06.png",
+                                color: "#099af7"
+                            },{
+                                name: "Hair",
+                                src: "layers/jyrras_07.png",
+                                color: "#1b1d1c"
+                            },{
+                                name: "Goggles",
+                                src: "layers/jyrras_08.png",
+                                color: "#003762"
+                            },{
+                                name: "Goggle Lenses",
+                                src: "layers/jyrras_09.png",
+                                color: "#72a3e5"
+                        }]
+                    },{
+                        name: "Lorenda", layers: [{
+                                name: "Background",
+                                src: "layers/lorenda_01.png",
+                                color: "#333254"
+                            },{
+                                name: "Dress",
+                                src: "layers/lorenda_02.png",
+                                color: "#735686"
+                            },{
+                                name: "Fur",
+                                src: "layers/lorenda_03.png",
+                                color: "#fee6f3"
+                            },{
+                                name: "Eyes",
+                                src: "layers/lorenda_04.png",
+                                color: "#d13dc5"
+                            },{
+                                name: "Hair",
+                                src: "layers/lorenda_05.png",
+                                color: "#d24e88"
+                            },{
+                                name: "Earrings",
+                                src: "layers/lorenda_06.png",
+                                color: "#f5aa45"
+                            },{
+                                name: "Horns",
+                                src: "layers/lorenda_07.png",
+                                color: "#524741"
+                        }]
+                }];
+
+                var holder = document.getElementById("t");
+                for(j=0; j<characters.length; j++) {
+                    var table = document.createElement("div");
+                    table.setAttribute("class", "hidden");
+                    table.setAttribute("id", "t-" + j);
+                    holder.appendChild(table);
+
+                    for(i=0; i<characters[j].layers.length; i++) {
+                        var layer = characters[j].layers[i];
+                        var row = document.createElement("span");
+                        row.setAttribute("class", "row");
+
+                        var label = document.createElement("label");
+                        label.setAttribute("for", "t-" + j + "-" + i);
+                        label.appendChild(document.createTextNode(layer.name));
+                        row.appendChild(label);
+
+                        var input = document.createElement("input");
+                        input.setAttribute("id", "t-" + j + "-" + i);
+                        input.setAttribute("type", "color");
+                        input.setAttribute("class", "color");
+                        input.setAttribute("onChange", "changeColor();");
+                        input.setAttribute("data-hex", "true");
+                        input.setAttribute("data-text", "hidden");
+                        input.setAttribute("value", layer.color);
+                        row.appendChild(input);
+
+                        table.appendChild(row);
+                    }
+                }
+
+                $.fn.mColorPicker.init.replace = false;
                 if(Modernizr.inputtypes.color) {
-                    $.fn.mColorPicker.init.replace = false;
                 } else {
-                    $('input.mColorPicker').bind('colorpicked', pickColor);
+                    $('input.color').mColorPicker();
+                    $('input.mColorPicker').bind('colorpicked', draw);
+                }
+
+                var imageList = [];
+                for(j=0; j<characters.length; j++) {
+                    for(i=0; i<characters[j].layers.length; i++) {
+                        imageList.push(characters[j].layers[i].src);
+                    }
                 }
                         
-                new ImagePreloader( [
-                            "layers/jyrras_01.png",
-                            "layers/jyrras_02.png",
-                            "layers/jyrras_03.png",
-                            "layers/jyrras_04.png",
-                            "layers/jyrras_05.png",
-                            "layers/jyrras_06.png",
-                            "layers/jyrras_07.png",
-                            "layers/jyrras_08.png",
-                            "layers/jyrras_09.png"],
-                        function(images) {
-                            layers = images;
-                            w = layers[0].width;
-                            h = layers[1].height; 
-                            n = layers.length;
-                            draw();
-                        });
+                new ImagePreloader(imageList, function(images) {
+                    for(j=0; j<characters.length; j++) {
+                        for(i=0; i<characters[j].layers.length; i++) {
+                            characters[j].layers[i].image = images.shift();
+                        }
+                    }
+                    
+                    choice = null;
+                    draw();
+                });
             });
-
-            function pickColor() {
-                draw();
-            }
 
             function changeColor() {
                 if(Modernizr.inputtypes.color) {
@@ -56,27 +157,41 @@
 
             function draw() {
                 var canvas = document.getElementById("draw_area");
-                canvas.width = w;
-                canvas.height = h;
                 if(canvas.getContext) {
+                    var oldChoice = choice;
+                    choice = document.getElementById("character").value;
+                    if(oldChoice !== choice) {
+                        if(oldChoice) {
+                            document.getElementById("t-" + oldChoice)
+                                    .setAttribute("class", "hidden");
+                        }
+                        document.getElementById("t-" + choice)
+                                .setAttribute("class", "table");
+                    }
+
+                    var n = characters[choice].layers.length;
+                    var w = characters[choice].layers[0].image.width;
+                    var h = characters[choice].layers[0].image.height;
+                    canvas.width = w;
+                    canvas.height = h;
+
                     var ctx = canvas.getContext("2d");
-                    ctx.clearRect(0, 0,
-                            canvas.clientWidth, canvas.clientHeight);
+                    ctx.clearRect(0, 0, w, h);
                     ctx.save();
 
                     var color = document.createElement("canvas");
                     color.width = w;
                     color.height = h;
                     var colorctx = color.getContext("2d");
-                    var cLayers = {};
+                    var colorLayers = [];
 
                     for (i=0; i < n; i++) {
                         colorctx.fillStyle = 
-                                document.getElementById("c"+i).value;
+                            document.getElementById("t-"+choice+"-"+i).value;
                         colorctx.fillRect(0, 0, w, h);
 
-                        cLayers[i] = Pixastic.process(
-                            layers[i], "blend",
+                        colorLayers[i] = Pixastic.process(
+                            characters[choice].layers[i].image, "blend",
                             {
                                 amount: 1,
                                 mode: "overlay",
@@ -88,7 +203,7 @@
                     ctx.fillStyle = "black";
                     ctx.fillRect(0, 0, w, h);
                     for(i=0; i < n; i++) {
-                        ctx.drawImage(cLayers[i], 0, 0);
+                        ctx.drawImage(colorLayers[i], 0, 0);
                     }
 
                     ctx.restore();
@@ -98,71 +213,53 @@
         <style type="text/css">
             body {text-align: center;}
             .table {display: inline-table;}
-            .row {display: table-row;
-                    border: 1px solid black;}
+            .hidden {display: none;}
+            .row {display: table-row;}
             label {display: table-cell;
                     text-align: left;
                     padding-right: 2px;}
             input {display: table-cell;
                     height: 1.8em;
                     width: 1.8em;}
+            fieldset {width: 250px;
+                    display: inline;}
         </style>
     </head>
     <body>
         <h2>Avatar Colorizer Demo</h2>
-        <canvas id="draw_area" width="200" height="200"></canvas>
-        <div><div class="table">
-            <span class="row">
-            <label for="c0">Background</label>
-            <input id="c0" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#43799F" />
-            </span>
-            <span class="row">
-            <label for="c1">Coat</label>
-            <input id="c1" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#608ABC" />
-            </span>
-            <span class="row">
-            <label for="c2">Turtleneck</label>
-            <input id="c2" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#363636" />
-            </span>
-            <span class="row">
-            <label for="c3">Fur</label>
-            <input id="c3" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#F2E083" />
-            </span>
-            <span class="row">
-            <label for="c4">Ears</label>
-            <input id="c4" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#E58A93" />
-            </span>
-            <span class="row">
-            <label for="c5">Eyes</label>
-            <input id="c5" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#099AF7" />
-            </span>
-            <span class="row">
-            <label for="c6">Hair</label>
-            <input id="c6" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#1B1D1C" />
-            </span>
-            <span class="row">
-            <label for="c7">Goggles</label>
-            <input id="c7" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#003762" />
-            </span>
-            <span class="row">
-            <label for="c8">Goggle Lenses</label>
-            <input id="c8" type="color" onChange="changeColor();"
-                    data-hex="true" data-text="hidden" value="#72A3E5" />
-            </span>
-        </div></div>
+        <p>Does not work in Internet Explorer.</p>
+        <fieldset>
+        <legend>Character: <select id="character" onChange="draw();">
+            <option value="0" selected="selected">Jyrras</option>
+            <option value="1">Lorenda</option>
+        </select></legend>
+        <canvas id="draw_area" width="234" height="200"></canvas>
+        <div id="t">
+        </div>
+        </fieldset>
 
-        <p>Pixastic is used under 
+        <p>
+            <a href="http://www.pixastic.com/">Pixastic</a> is used under 
             <a href="http://www.pixastic.com/lib/license.txt">
-                the Mozilla Public License</a>.
-        <br />Jyrras is used under <a href="http://missmab.com/about.php">
-                the DMFA art usage policy</a>.</p>
+            the Mozilla Public License</a>.
+        <br />
+            <a href="http://blog.meta100.com/post/600571131/mcolorpicker">
+            mColorPicker</a>, <a href="http://www.modernizr.com/">Modernizr</a>,
+            and <a href="http://jquery.com/">jQuery</a> are used under
+            <a href="http://www.opensource.org/licenses/mit-license.php">
+            the MIT License</a>.
+        <br />
+            Jyrras and Lorenda from <a href="http://missmab.com/">
+            DMFA</a> are used under
+            <a href="http://missmab.com/about.php">
+            the DMFA art usage policy</a>.
+        <!--
+        <br />
+            Flora and Natani from <a href="http://twokinds.keenspot.com/">
+            TwoKinds</a> are used under
+            <a href="http://twokinds.keenspot.com/?pageid=9">
+            the CC-BY-NC-SA license</a>.
+        -->
+        </p>
     </body>
 </html>
