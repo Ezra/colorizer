@@ -112,7 +112,11 @@
                         var input = document.createElement("input");
                         input.setAttribute("id", "t-" + j + "-" + i);
                         input.setAttribute("type", "color");
-                        input.setAttribute("class", "color");
+                        if(Modernizr.inputtypes.color) {
+                            input.setAttribute("class", "colorO");
+                        } else {
+                            input.setAttribute("class", "colorF");
+                        }
                         input.setAttribute("onChange", "changeColor();");
                         input.setAttribute("data-hex", "true");
                         input.setAttribute("data-text", "hidden");
@@ -124,11 +128,8 @@
                 }
 
                 $.fn.mColorPicker.init.replace = false;
-                if(Modernizr.inputtypes.color) {
-                } else {
-                    $('input.color').mColorPicker();
-                    $('input.mColorPicker').bind('colorpicked', draw);
-                }
+                $('input.colorF').mColorPicker();
+                $('input.mColorPicker').bind('colorpicked', draw);
 
                 var imageList = [];
                 for(j=0; j<characters.length; j++) {
@@ -218,8 +219,8 @@
             label {display: table-cell;
                     text-align: left;
                     padding-right: 2px;}
-            input.color {display: table-cell;}
-            span.mColorPickerTrigger {display: table-cell;
+            input.colorO {display: table-cell;}
+            input.colorF {display: table-cell;
                     height: 1.8em;
                     width: 1.8em;}
             fieldset {width: 250px;
