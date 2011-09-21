@@ -1,10 +1,11 @@
 Tech for colorizing avatars and other images.
 For use in Skyrates (Skycust) and related projects.
 
+Currently does not work in Internet Explorer due to Pixastic dependencies.
+
+
 --Licensing--
 
 Pixastic is used under the Mozilla Public License.
-http://www.pixastic.com/lib/license.txt
-
-Jyrras is used under the DMFA art usage policy.
-http://missmab.com/about.php
+mColorPicker, Modernizr, and jQuery are used under the MIT License.
+Jyrras and Lorenda from DMFA are used under the DMFA art usage policy.

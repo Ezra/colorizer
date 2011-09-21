@@ -22,6 +22,24 @@
             var choice;
 
             $(document).ready( function() {
+                if(! Modernizr.canvas) {
+                    var fieldset = document.getElementById("fieldset");
+                    while(fieldset.childNodes.length >= 1) {
+                        fieldset.removeChild(fieldset.firstChild);
+                    }
+                    var legend = document.createElement("legend");
+                    legend.appendChild(document.createTextNode("Character"));
+                    fieldset.appendChild(legend);
+                    var para = document.createElement("p");
+                    para.appendChild(document.createTextNode(
+                        "Your browser does not support HTML5 Canvas. " +
+                        "This demo is visible in 2011 versions of Firefox, " +
+                        "Chrome, Opera, and Safari."));
+                    fieldset.appendChild(para);
+                    return;
+                }
+
+
                 characters = [{
                         name: "Jyrras", layers: [{
                                 name: "Background",
@@ -229,8 +247,7 @@
     </head>
     <body>
         <h2>Avatar Colorizer Demo</h2>
-        <p>Does not work in Internet Explorer.</p>
-        <fieldset>
+        <fieldset id"fieldset">
         <legend>Character: <select id="character" onChange="draw();">
             <option value="0" selected="selected">Jyrras</option>
             <option value="1">Lorenda</option>
@@ -262,6 +279,8 @@
             <a href="http://twokinds.keenspot.com/?pageid=9">
             the CC-BY-NC-SA license</a>.
         -->
+        <br />
+            Source code copyright 2010 Ezra Bradford.
         </p>
     </body>
 </html>
