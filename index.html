@@ -28,13 +28,15 @@
                         fieldset.removeChild(fieldset.firstChild);
                     }
                     var legend = document.createElement("legend");
-                    legend.appendChild(document.createTextNode("Character"));
+                    legend.appendChild(document.createTextNode("Error"));
                     fieldset.appendChild(legend);
                     var para = document.createElement("p");
                     para.appendChild(document.createTextNode(
-                        "Your browser does not support HTML5 Canvas. " +
-                        "This demo is visible in 2011 versions of Firefox, " +
-                        "Chrome, Opera, and Safari."));
+                        "Your browser does not support HTML5 Canvas."));
+                    fieldset.appendChild(para);
+                    para = document.createElement("p");
+                    para.appendChild(document.createTextNode(
+                        "Try Firefox, Chrome, Opera, or Safari."));
                     fieldset.appendChild(para);
                     return;
                 }
@@ -247,7 +249,7 @@
     </head>
     <body>
         <h2>Avatar Colorizer Demo</h2>
-        <fieldset id"fieldset">
+        <fieldset id="fieldset">
         <legend>Character: <select id="character" onChange="draw();">
             <option value="0" selected="selected">Jyrras</option>
             <option value="1">Lorenda</option>
