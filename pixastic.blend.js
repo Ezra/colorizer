@@ -201,7 +201,7 @@ var Pixastic = (function() {
 			options = options || {};
 
 			var imageIsCanvas = (img.tagName.toLowerCase() == "canvas");
-			if (imageIsCanvas && Pixastic.Client.isIE()) {
+			if (imageIsCanvas && !hasCanvas()) {
 				if (Pixastic.debug) writeDebug("Tried to process a canvas element but browser is IE.");
 				return false;
 			}

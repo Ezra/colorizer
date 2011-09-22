@@ -22,7 +22,7 @@
             var choice;
 
             $(document).ready( function() {
-                if(Pixastic.Client.isIE()) {
+                if(! Modernizr.canvas) {
                     var fieldset = document.getElementById("fieldset");
                     while(fieldset.childNodes.length >= 1) {
                         fieldset.removeChild(fieldset.firstChild);
@@ -32,15 +32,17 @@
                     fieldset.appendChild(legend);
                     var para = document.createElement("p");
                     para.appendChild(document.createTextNode(
-                        "Pixastic doesn't support your browser."));
+                        "Your browser doesn't have HTML5 Canvas."));
                     fieldset.appendChild(para);
                     para = document.createElement("p");
                     para.appendChild(document.createTextNode(
-                        "Try Firefox, Chrome, Opera, or Safari."));
+                        "Try Firefox, Chrome, Opera, or Safari,"));
+                    para.appendChild(document.createElement("br"));
+                    para.appendChild(document.createTextNode(
+                        "or upgrade to Internet Explorer 9."));
                     fieldset.appendChild(para);
                     return;
                 }
-
 
                 characters = [{
                         name: "Jyrras", layers: [{
@@ -211,8 +213,14 @@
                             document.getElementById("t-"+choice+"-"+i).value;
                         colorctx.fillRect(0, 0, w, h);
 
+                        var layer = document.createElement("canvas");
+                        layer.width = w;
+                        layer.height = h;
+                        layer.getContext("2d").drawImage(
+                                characters[choice].layers[i].image, 0, 0);
+
                         colorLayers[i] = Pixastic.process(
-                            characters[choice].layers[i].image, "blend",
+                            layer, "blend",
                             {
                                 amount: 1,
                                 mode: "overlay",
@@ -282,7 +290,7 @@
             the CC-BY-NC-SA license</a>.
         -->
         <br />
-            Source code copyright 2010 Ezra Bradford.
+            Source code copyright 2011 Ezra Bradford.
         </p>
     </body>
 </html>
